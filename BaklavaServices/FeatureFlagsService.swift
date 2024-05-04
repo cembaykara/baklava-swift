@@ -70,7 +70,7 @@ public extension Service where Entity: FeatureFlag {
 	}
 	
 	@discardableResult
-	func update(_ object: Entity) -> AnyPublisher<Entity, Error> {
+	func update(_ object: Entity) -> AnyPublisher<URLResponse, Error> {
 		guard let id = object.id else {
 			return Fail(error: ServiceError.urlError())
 				.eraseToAnyPublisher()
@@ -92,8 +92,7 @@ public extension Service where Entity: FeatureFlag {
 		request.httpBody = payload
 		
 		return RequestHandler.execute(request)
-			.map(\.data)
-			.decode(type: Entity.self, decoder: JSONDecoder())
+			.map(\.response)
 			.eraseToAnyPublisher()
 	}
 }
