@@ -9,21 +9,21 @@ let package = Package(
 	products: [
 		// Products define the executables and libraries a package produces, making them visible to other packages.
 		.library(
-			name: "Core",
-			targets: ["Core"]),
+			name: "BaklavaCore",
+			targets: ["BaklavaCore"]),
 		.library(
-			name: "Services",
-			targets: ["Services"]),
+			name: "BaklavaServices",
+			targets: ["BaklavaServices"]),
 	],
 	targets: [
 		// Targets are the basic building blocks of a package, defining a module or a test suite.
 		// Targets can depend on other targets in this package and products from dependencies.
 		.target(
-			name: "Core",
-			path: "Core"),
+			name: "BaklavaCore",
+			path: "BaklavaCore"),
 		.target(
-			name: "Services",
-			dependencies: ["Core"],
-		path: "Services")
+			name: "BaklavaServices",
+			dependencies: ["BaklavaCore"],
+		path: "BaklavaServices")
 	]
 )

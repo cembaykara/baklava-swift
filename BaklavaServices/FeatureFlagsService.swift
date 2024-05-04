@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import Core
+import BaklavaCore
 
 // TODO: Implement a request builder
 // TODO: Implement an Endpoint builder

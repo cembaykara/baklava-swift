@@ -1,5 +1,5 @@
 //
-//  FFLogger.swift
+//  BKLLogger.swift
 //
 //
 //  Created by Baris Cem Baykara on 04.05.2024.
@@ -8,13 +8,13 @@
 import Foundation
 import OSLog
 
-class FFLogger {
+class BKLLogger {
 	
 	/// Writes a message to the `OSLog` based on the configured log verbosity level.
-	public static func log(_ entry: FFLogEntry) {
+	public static func log(_ entry: BKLLogEntry) {
 		let logger = Logger(subsystem: entry.subSystem, category: entry.category)
 		
-		if entry.verbosityLevel <= FFSDK.configuration.logVerbosity {
+		if entry.verbosityLevel <= Baklava.configuration.logVerbosity {
 			switch entry.verbosityLevel {
 				case .none:
 					return

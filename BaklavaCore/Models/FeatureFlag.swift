@@ -1,5 +1,9 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+//
+//  FeatureFlag.swift
+//
+//
+//  Created by Baris Cem Baykara on 04.05.2024.
+//
 
 import Foundation
 

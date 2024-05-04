@@ -37,7 +37,7 @@ public struct RequestHandler {
 			do {
 				_request = try interceptor.adapt(request: request).get()
 			} catch {
-				FFLogger.log(FFLogEntry(subSystem: "Core", category: "Network", verbosityLevel: .error, message: error.localizedDescription))
+				BKLLogger.log(BKLLogEntry(subSystem: "Core", category: "Network", verbosityLevel: .error, message: error.localizedDescription))
 			}
 		}
 		
@@ -57,7 +57,7 @@ public struct RequestHandler {
 						
 						/// Retry when these types of errors are thrown
 					case RequestError.noResponse, RequestError.invalidStatusCode(_,_):
-						FFLogger.log(FFLogEntry(subSystem: "Core", category: "Network", verbosityLevel: .error, message: error.localizedDescription))
+						BKLLogger.log(BKLLogEntry(subSystem: "Core", category: "Network", verbosityLevel: .error, message: error.localizedDescription))
 						return Fail(error: error)
 							.delay(for: .seconds(interceptor?.delayInterval ?? 0), scheduler: DispatchQueue.main)
 							.eraseToAnyPublisher()

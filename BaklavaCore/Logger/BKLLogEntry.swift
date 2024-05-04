@@ -1,5 +1,5 @@
 //
-//  FFLogEntry.swift
+//  BKLLogEntry.swift
 //
 //
 //  Created by Baris Cem Baykara on 04.05.2024.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct FFLogEntry {
+public struct BKLLogEntry {
 	
 	/// The `OSLog` subsystem
 	public var subSystem: String

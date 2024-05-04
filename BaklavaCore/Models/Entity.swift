@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  EntityProtocol.swift
 //  
 //
 //  Created by Baris Cem Baykara on 04.05.2024.

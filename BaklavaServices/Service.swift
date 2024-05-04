@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Core
+import BaklavaCore
 
 public struct Service<Entity> where Entity: EntityProtocol & Codable {
 	
