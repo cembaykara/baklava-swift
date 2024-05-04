@@ -15,7 +15,7 @@
 
  ```swift
  dependencies: [
-     .package(url: "https://github.com/cembaykara/baklava-swift", from: "0.1.0"),
+     .package(url: "https://github.com/cembaykara/baklava-swift", from: "0.1.1"),
      ...
  ]
  ```
@@ -31,16 +31,16 @@
 ---
 
 ### Usage
- The SDK currently has two libraries **Core** and **Services**. You probobly want both of them added. If you are defining any Entity models you would want to:
+ The SDK currently has two libraries **BaklavaCore** and **BaklavaServices**. You probobly want both of them added. If you are defining any Entity models you would want to:
 
  ```swift
- import Core
+ import BaklavaCore
  ```
 
  ###### Example
  ```swift
  import Foundation
- import Core
+ import BaklavaCore
 
  final class Flag: FeatureFlag {
 	var id: UUID?
@@ -56,17 +56,17 @@
  ```
  Core hosts common models, logger and some basic networking features. Everything except the models will probobly be set internal.
  
- For the networking logic you would need the **Services** module.
+ For the networking logic you would need the **BaklavaServices** module.
 
  ```swift
- import Core
+ import BaklavaServices
  ```
 
  ###### Example
   ```swift
  import Foundation
  import Combine
- import Services
+ import BaklavaServices
 
   @Observable class FeatureFlagsViewModel {
 	var flags: [Flag] = []
