@@ -46,6 +46,7 @@ public extension Service where Entity: FeatureFlag {
 			.eraseToAnyPublisher()
 	}
 	
+	@discardableResult
 	func createNew(object: Entity) -> AnyPublisher<Entity, Error> {
 		guard let url = URL(string: "http://127.0.0.1:8080/flags") else {
 			return Fail(error: ServiceError.urlError())
@@ -65,6 +66,33 @@ public extension Service where Entity: FeatureFlag {
 		return RequestHandler.execute(request)
 			.map(\.data)
 			.decode(type: Entity.self, decoder: JSONDecoder())
+			.eraseToAnyPublisher()
+	}
+	
+	@discardableResult
+	func update(_ object: Entity) -> AnyPublisher<URLResponse, Error> {
+		guard let id = object.id else {
+			return Fail(error: ServiceError.urlError())
+				.eraseToAnyPublisher()
+		}
+		
+		guard let url = URL(string: "http://127.0.0.1:8080/flags/\(id.uuidString)") else {
+			return Fail(error: ServiceError.urlError())
+				.eraseToAnyPublisher()
+		}
+		
+		guard let payload = try? JSONEncoder().encode(object) else {
+			return Fail(error: ServiceError.urlError())
+				.eraseToAnyPublisher()
+		}
+		
+		var request = URLRequest(url: url)
+		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+		request.httpMethod = "PUT"
+		request.httpBody = payload
+		
+		return RequestHandler.execute(request)
+			.map(\.response)
 			.eraseToAnyPublisher()
 	}
 }
