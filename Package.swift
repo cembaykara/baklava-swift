@@ -24,9 +24,6 @@ let package = Package(
 		.target(
 			name: "Services",
 			dependencies: ["Core"],
-		path: "Services"),
-		.testTarget(
-			name: "MyLibraryTests",
-			dependencies: ["Core"]),
+		path: "Services")
 	]
 )
