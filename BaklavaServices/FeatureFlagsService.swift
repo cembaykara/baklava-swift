@@ -17,7 +17,7 @@ import BaklavaCore
 public extension Service where Entity: FeatureFlag {
 	
 	func getFlags() -> AnyPublisher<[Entity], Error> {
-		guard let url = URL(string: "http://127.0.0.1:8080/flags") else {
+		guard let url = FeatureFlagEndpoint.baseURL() else {
 			return Fail(error: ServiceError.urlError())
 				.eraseToAnyPublisher()
 		}
@@ -33,7 +33,7 @@ public extension Service where Entity: FeatureFlag {
 	
 	@discardableResult
 	func deleteBy(id: UUID) -> AnyPublisher<URLResponse, Error> {
-		guard let url = URL(string: "http://127.0.0.1:8080/flags/\(id.uuidString)") else {
+		guard let url = FeatureFlagEndpoint.delete(id: id).url() else {
 			return Fail(error: ServiceError.urlError())
 				.eraseToAnyPublisher()
 		}
@@ -48,7 +48,7 @@ public extension Service where Entity: FeatureFlag {
 	
 	@discardableResult
 	func createNew(object: Entity) -> AnyPublisher<Entity, Error> {
-		guard let url = URL(string: "http://127.0.0.1:8080/flags") else {
+		guard let url = FeatureFlagEndpoint.baseURL() else {
 			return Fail(error: ServiceError.urlError())
 				.eraseToAnyPublisher()
 		}
@@ -76,7 +76,7 @@ public extension Service where Entity: FeatureFlag {
 				.eraseToAnyPublisher()
 		}
 		
-		guard let url = URL(string: "http://127.0.0.1:8080/flags/\(id.uuidString)") else {
+		guard let url = FeatureFlagEndpoint.update(id: id).url() else {
 			return Fail(error: ServiceError.urlError())
 				.eraseToAnyPublisher()
 		}
