@@ -32,6 +32,10 @@ public extension Endpoint {
 		return Baklava.configuration.port
 	}
 	
+	static private var preferSecureConnection: Bool {
+		return !Baklava.configuration.disableSecureConnection
+	}
+	
 	static func baseURL(with parameters: [any EndpointParameter]? = nil) -> URL? {
 		return newComponent(with: parameters).url
 	}
@@ -48,7 +52,7 @@ public extension Endpoint {
 	
 	private static func newComponent(with parameters: [any EndpointParameter]? = nil) -> URLComponents {
 		var component = URLComponents()
-		component.scheme = "https"
+		component.scheme = preferSecureConnection ? "https" : "http"
 		component.host = Self.host
 		component.path = Self.basePath
 		

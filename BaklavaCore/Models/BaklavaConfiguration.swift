@@ -15,10 +15,16 @@ public struct BaklavaConfiguration {
 	
 	let port: Int?
 	
-	public init(logVerbosity: LogVerbosityLevel = .critical, host: String? = nil, port: Int? = nil) {
-		self.logVerbosity = logVerbosity
-		self.host = host
-		self.port = port
-	}
+	let disableSecureConnection: Bool
 	
+	public init(
+		logVerbosity: LogVerbosityLevel = .critical,
+		host: String? = nil,
+		port: Int? = nil,
+		disableSecureConnection: Bool = true) {
+			self.logVerbosity = logVerbosity
+			self.host = host
+			self.port = port
+			self.disableSecureConnection = disableSecureConnection
+		}
 }
