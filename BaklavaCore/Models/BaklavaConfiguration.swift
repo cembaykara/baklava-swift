@@ -13,9 +13,12 @@ public struct BaklavaConfiguration {
 	
 	let host: String?
 	
-	public init(logVerbosity: LogVerbosityLevel = .critical, host: String? = nil) {
+	let port: Int?
+	
+	public init(logVerbosity: LogVerbosityLevel = .critical, host: String? = nil, port: Int? = nil) {
 		self.logVerbosity = logVerbosity
 		self.host = host
+		self.port = port
 	}
 	
 }

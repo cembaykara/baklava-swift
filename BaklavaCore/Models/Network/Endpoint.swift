@@ -28,6 +28,10 @@ public extension Endpoint {
 		return hostUrl
 	}
 	
+	static private var port: Int? {
+		return Baklava.configuration.port
+	}
+	
 	static func baseURL(with parameters: [any EndpointParameter]? = nil) -> URL? {
 		return newComponent(with: parameters).url
 	}
@@ -48,8 +52,10 @@ public extension Endpoint {
 		component.host = Self.host
 		component.path = Self.basePath
 		
+		if let port = self.port { component.port = port }
+		
 		guard let parameters = parameters else { return component }
-		var queryItems: [URLQueryItem] = parameters.compactMap { $0.makeQueryItem() }
+		let queryItems: [URLQueryItem] = parameters.compactMap { $0.makeQueryItem() }
 		component.queryItems = queryItems
 		
 		return component
