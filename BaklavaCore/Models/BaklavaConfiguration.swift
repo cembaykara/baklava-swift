@@ -13,7 +13,7 @@ public struct BaklavaConfiguration {
 	
 	let host: String?
 	
-	init(logVerbosity: LogVerbosityLevel = .critical, host: String? = nil) {
+	public init(logVerbosity: LogVerbosityLevel = .critical, host: String? = nil) {
 		self.logVerbosity = logVerbosity
 		self.host = host
 	}
