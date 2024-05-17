@@ -22,13 +22,14 @@ public extension Service where Entity: FeatureFlag {
 				.eraseToAnyPublisher()
 		}
 		
-		var request = URLRequest(url: url)
-		request.httpMethod = "GET"
-		
-		return RequestHandler.execute(request)
-			.map(\.data)
-			.decode(type: [Entity].self, decoder: JSONDecoder())
-			.eraseToAnyPublisher()
+		do {
+			var request = try URLRequest.baklavaRequest(url: url, httpMethod: .get)
+			
+			return RequestHandler.execute(request)
+				.map(\.data)
+				.decode(type: [Entity].self, decoder: JSONDecoder())
+				.eraseToAnyPublisher()
+		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }
 	}
 	
 	@discardableResult
@@ -38,12 +39,13 @@ public extension Service where Entity: FeatureFlag {
 				.eraseToAnyPublisher()
 		}
 		
-		var request = URLRequest(url: url)
-		request.httpMethod = "DELETE"
-		
-		return RequestHandler.execute(request)
-			.map(\.response)
-			.eraseToAnyPublisher()
+		do {
+			var request = try URLRequest.baklavaRequest(url: url, httpMethod: .delete)
+			
+			return RequestHandler.execute(request)
+				.map(\.response)
+				.eraseToAnyPublisher()
+		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }
 	}
 	
 	@discardableResult
@@ -53,20 +55,14 @@ public extension Service where Entity: FeatureFlag {
 				.eraseToAnyPublisher()
 		}
 		
-		guard let payload = try? JSONEncoder().encode(object) else {
-			return Fail(error: ServiceError.urlError()) // TODO: Implement appropriate error logging
+		do {
+			var request = try URLRequest.baklavaRequest(url: url, httpMethod: .post(object))
+			
+			return RequestHandler.execute(request)
+				.map(\.data)
+				.decode(type: Entity.self, decoder: JSONDecoder())
 				.eraseToAnyPublisher()
-		}
-		
-		var request = URLRequest(url: url)
-		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-		request.httpMethod = "POST"
-		request.httpBody = payload
-		
-		return RequestHandler.execute(request)
-			.map(\.data)
-			.decode(type: Entity.self, decoder: JSONDecoder())
-			.eraseToAnyPublisher()
+		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }
 	}
 	
 	@discardableResult
@@ -81,19 +77,13 @@ public extension Service where Entity: FeatureFlag {
 				.eraseToAnyPublisher()
 		}
 		
-		guard let payload = try? JSONEncoder().encode(object) else {
-			return Fail(error: ServiceError.urlError())
+		do {
+			var request = try URLRequest.baklavaRequest(url: url, httpMethod: .put(object))
+			
+			return RequestHandler.execute(request)
+				.map(\.response)
 				.eraseToAnyPublisher()
-		}
-		
-		var request = URLRequest(url: url)
-		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-		request.httpMethod = "PUT"
-		request.httpBody = payload
-		
-		return RequestHandler.execute(request)
-			.map(\.response)
-			.eraseToAnyPublisher()
+		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }
 	}
 }
 
