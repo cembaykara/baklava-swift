@@ -9,8 +9,6 @@ import Foundation
 import Combine
 import BaklavaCore
 
-// TODO: Implement a request builder
-// TODO: Implement an Endpoint builder
 // TODO: Add better error handling
 // TODO: Log errors better
 
