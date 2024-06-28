@@ -11,6 +11,27 @@ import Foundation
 
 public extension URLRequest {
 	
+    /// Builds a `URLRequest`object for a `BaklavaService` request.
+    ///
+    /// - Warning: This will be internal. Call from `BaklavaService`.
+    ///
+    /// # Example:
+    ///
+    /// ```swift
+    /// ...
+    /// var flags: [Flag] = []
+    ///
+    ///private var cancellable = Set<AnyCancellable>()
+    ///private let service = Service(Flag.self)
+    ///
+    ///func fetchFlags() {
+    ///    service.getFlags()
+    ///        .sink { print($0) } receiveValue: { self.flags = $0 }
+    ///        .store(in: &cancellable)
+    ///}
+    ///...
+    /// ```
+    ///
 	static func baklavaRequest(url: URL, httpMethod: HTTPMethod) throws -> URLRequest {
 		var request = URLRequest(url: url)
 		
