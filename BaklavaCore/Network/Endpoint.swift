@@ -7,12 +7,12 @@
 
 import Foundation
 
-public protocol EndpointParameter {
+@_spi(BKLInternal) public protocol EndpointParameter {
 	
 	func makeQueryItem() -> URLQueryItem
 }
 
-public protocol Endpoint {
+@_spi(BKLInternal) public protocol Endpoint {
 	
 	/// The base path for API endpoints.
 	static var basePath: String { get }
@@ -21,7 +21,7 @@ public protocol Endpoint {
 	var path: String { get }
 }
 
-public extension Endpoint {
+@_spi(BKLInternal) public extension Endpoint {
 	
 	static private var host: String {
 		guard let hostUrl = Baklava.configuration.host else { fatalError("No host address was provided. Did you configure Baklava correctly?") }
