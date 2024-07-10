@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import BaklavaCore
+@_spi(BKLInternal) import BaklavaCore
 
 internal enum FeatureFlagEndpoint: Endpoint {
 	case update(id: UUID)

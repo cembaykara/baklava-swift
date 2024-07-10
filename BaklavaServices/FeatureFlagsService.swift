@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import BaklavaCore
+@_spi(BKLInternal) import BaklavaCore
 
 // TODO: Add better error handling
 // TODO: Log errors better
@@ -21,7 +21,7 @@ public extension Service where Entity: FeatureFlag {
 		}
 		
 		do {
-			var request = try URLRequest.baklavaRequest(url: url, httpMethod: .get)
+			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .get)
 			
 			return RequestHandler.execute(request)
 				.map(\.data)
@@ -38,7 +38,7 @@ public extension Service where Entity: FeatureFlag {
 		}
 		
 		do {
-			var request = try URLRequest.baklavaRequest(url: url, httpMethod: .delete)
+			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .delete)
 			
 			return RequestHandler.execute(request)
 				.map(\.response)
@@ -54,7 +54,7 @@ public extension Service where Entity: FeatureFlag {
 		}
 		
 		do {
-			var request = try URLRequest.baklavaRequest(url: url, httpMethod: .post(object))
+			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .post(object))
 			
 			return RequestHandler.execute(request)
 				.map(\.data)
@@ -76,7 +76,7 @@ public extension Service where Entity: FeatureFlag {
 		}
 		
 		do {
-			var request = try URLRequest.baklavaRequest(url: url, httpMethod: .put(object))
+			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .put(object))
 			
 			return RequestHandler.execute(request)
 				.map(\.response)
