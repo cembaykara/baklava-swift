@@ -15,7 +15,7 @@ import JWTDecode
 public struct User {
     
     /// User ID
-    var id: String
+    public var id: String
 }
 
 extension User {
