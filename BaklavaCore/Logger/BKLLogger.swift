@@ -8,12 +8,16 @@
 import Foundation
 import OSLog
 
-class BKLLogger {
+@_spi(BKLInternal) public class BKLLogger {
+    
+    private let logger: Logger
+    
+    public init(subsystem: String, category: String) {
+        self.logger = Logger(subsystem: subsystem, category: category)
+    }
 	
 	/// Writes a message to the `OSLog` based on the configured log verbosity level.
-	public static func log(_ entry: BKLLogEntry) {
-		let logger = Logger(subsystem: entry.subSystem, category: entry.category)
-		
+	public func log(_ entry: BKLLogEntry) {
 		if entry.verbosityLevel <= Baklava.configuration.logVerbosity {
 			switch entry.verbosityLevel {
 				case .none:

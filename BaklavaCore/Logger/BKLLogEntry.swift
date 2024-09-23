@@ -8,22 +8,14 @@
 import Foundation
 
 public struct BKLLogEntry {
-	
-	/// The `OSLog` subsystem
-	public var subSystem: String
-	
-	///  The `OSLog` category
-	public var category: String
-	
+
 	///  The `OSLog` verbosity
 	public var verbosityLevel: LogVerbosityLevel
 	
 	/// Message to be logged to the `OSLog`
 	public var message: String
 	
-	public init(subSystem: String, category: String, verbosityLevel: LogVerbosityLevel, message: String) {
-		self.subSystem = subSystem
-		self.category = category
+	public init(verbosityLevel: LogVerbosityLevel, message: String) {
 		self.verbosityLevel = verbosityLevel
 		self.message = message
 	}

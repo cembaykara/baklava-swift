@@ -30,6 +30,8 @@ public struct RequestHandler {
 	@discardableResult
 	public static func execute(_ request: URLRequest, interceptor: Interceptor? = nil) -> AnyPublisher<URLSession.DataTaskPublisher.Output, Error> {
 		
+        var requestLogger = BKLLogger(subsystem: "BKL", category: "Network")
+        
 		let session = URLSession.shared
 		var _request = request
 		
@@ -37,9 +39,17 @@ public struct RequestHandler {
 			do {
 				_request = try interceptor.adapt(request: request).get()
 			} catch {
-				BKLLogger.log(BKLLogEntry(subSystem: "BKL", category: "Network", verbosityLevel: .error, message: error.localizedDescription))
+                requestLogger.log(
+                    BKLLogEntry(
+                        verbosityLevel: .error,
+                        message: error.localizedDescription))
 			}
 		}
+        
+        requestLogger.log(
+            BKLLogEntry(
+                verbosityLevel: .debug,
+                message: "Request: \(_request.description)"))
 		
 		return session.dataTaskPublisher(for: _request)
 			.tryMap { dataTaskOutput -> Result<URLSession.DataTaskPublisher.Output, Error> in
@@ -57,7 +67,10 @@ public struct RequestHandler {
 						
 						/// Retry when these types of errors are thrown
 					case RequestError.noResponse, RequestError.invalidStatusCode(_,_):
-						BKLLogger.log(BKLLogEntry(subSystem: "BKL", category: "Network", verbosityLevel: .error, message: error.localizedDescription))
+                        requestLogger.log(
+                            BKLLogEntry(
+                                verbosityLevel: .error,
+                                message: error.localizedDescription))
 						return Fail(error: error)
 							.delay(for: .seconds(interceptor?.delayInterval ?? 0), scheduler: DispatchQueue.main)
 							.eraseToAnyPublisher()
