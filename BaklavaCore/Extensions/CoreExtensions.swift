@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - URLRequest
-
+@_spi(BKLInternal)
 public extension URLRequest {
 	
     /// Builds a `URLRequest`object for a `BaklavaService` request.

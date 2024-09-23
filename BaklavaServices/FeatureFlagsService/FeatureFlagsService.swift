@@ -24,7 +24,7 @@ public extension Service where Entity: FeatureFlag {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .get)
 			
 			return RequestHandler.execute(request)
-				.map(\.data)
+                .map(\.data)
 				.decode(type: [Entity].self, decoder: JSONDecoder())
 				.eraseToAnyPublisher()
 		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }

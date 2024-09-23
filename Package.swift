@@ -14,16 +14,27 @@ let package = Package(
 		.library(
 			name: "BaklavaServices",
 			targets: ["BaklavaServices"]),
+        .library(
+            name: "BaklavaAuth",
+            targets: ["BaklavaAuth"]),
 	],
+    dependencies: [
+        .package(name: "JWTDecode", url: "https://github.com/auth0/JWTDecode.swift.git", .upToNextMajor(from: "3.1.0")),
+    ],
 	targets: [
 		// Targets are the basic building blocks of a package, defining a module or a test suite.
 		// Targets can depend on other targets in this package and products from dependencies.
 		.target(
 			name: "BaklavaCore",
+            dependencies: ["JWTDecode"],
 			path: "BaklavaCore"),
 		.target(
 			name: "BaklavaServices",
 			dependencies: ["BaklavaCore"],
-		path: "BaklavaServices")
+		path: "BaklavaServices"),
+        .target(
+            name: "BaklavaAuth",
+            dependencies: ["BaklavaCore"],
+            path: "BaklavaAuth")
 	]
 )
