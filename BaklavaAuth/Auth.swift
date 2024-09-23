@@ -9,7 +9,7 @@ import Foundation
 import Combine
 @_spi(BKLInternal) import BaklavaCore
 
-actor Auth {
+public actor Auth {
 
     /// Authentication token
     private(set) static public var authToken: String?
