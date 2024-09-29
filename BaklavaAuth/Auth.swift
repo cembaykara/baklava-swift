@@ -30,6 +30,11 @@ extension Auth {
         } catch { throw error }
     }
     
+    /// Gets the auth token
+    public static func getAuthToken() async -> String? {
+        return await Auth._getAuthToken()
+    }
+    
     /// Removes locally stored user data and signs out the user
     public static func signOut() {
         Auth._signOut()
@@ -75,6 +80,11 @@ extension Auth {
             if let tokenString {  let _ = try AuthToken(tokenString) }
             await Session.shared.setAuthToken(tokenString)
         } catch { throw AuthError.error(error) }
+    }
+    
+    /// Gets the ```authToken```
+    private static func _getAuthToken() async -> String? {
+        return await Session.shared.authToken
     }
     
     /// Clears all the tokens both in memory and in keychain
