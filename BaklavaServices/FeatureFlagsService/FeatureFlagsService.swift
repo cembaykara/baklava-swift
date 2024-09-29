@@ -14,7 +14,6 @@ import Combine
 
 public extension Service where Entity: FeatureFlag {
 	
-    /// 
     func getFlags() async throws -> [Entity] {
 		
         guard let url = FeatureFlagEndpoint.baseURL() else {
@@ -24,7 +23,7 @@ public extension Service where Entity: FeatureFlag {
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .get)
 			
-            return try await Session.performHttp(request).decode(as: [Entity].self)
+            return try await Session.performHttp(request, interceptor: FeatureFlagsInterceptor()).decode(as: [Entity].self)
         } catch { throw ServiceError.error(error) }
 	}
 	
@@ -36,8 +35,8 @@ public extension Service where Entity: FeatureFlag {
 		
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .delete)
-			
-            try await Session.performHttp(request)
+            try await Session.performHttp(request, interceptor: FeatureFlagsInterceptor())
+            
             return true
 		} catch { throw ServiceError.error(error) }
 	}
@@ -51,7 +50,7 @@ public extension Service where Entity: FeatureFlag {
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .post(object))
 			
-            return try await Session.performHttp(request).decode(as: Entity.self)
+            return try await Session.performHttp(request, interceptor: FeatureFlagsInterceptor()).decode(as: Entity.self)
 		} catch { throw ServiceError.error(error) }
 	}
 	
@@ -67,10 +66,9 @@ public extension Service where Entity: FeatureFlag {
 		
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .put(object))
-			
-			try await Session.performHttp(request)
+            try await Session.performHttp(request, interceptor: FeatureFlagsInterceptor())
+            
             return true
 		} catch { throw ServiceError.error(error) }
 	}
 }
-

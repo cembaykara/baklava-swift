@@ -19,7 +19,7 @@ public protocol Interceptor {
 	var delayInterval: TimeInterval { get set }
 	
 	/// Adapts the request for retrying
-	func adapt(request: URLRequest) async throws -> Result<URLRequest, Error>
+	func adapt(request: URLRequest) async -> Result<URLRequest, Error>
 }
 
 @_spi(BKLInternal) public actor Session {
