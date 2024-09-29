@@ -9,10 +9,7 @@ import Foundation
 import Combine
 @_spi(BKLInternal) import BaklavaCore
 
-public actor Auth {
-
-    /// Authentication token
-    private(set) static public var authToken: String?
+public struct Auth {
     
     private init() { }
 }
@@ -25,10 +22,12 @@ extension Auth {
     ///
     /// - Warning: Use this method **only** if you have set
     /// ```AuthConfiguration/preferKeychain``` configuration to `false` and token management is done manually.
-    public static func setAuthToken(_ tokenString: String?) throws {
+    public static func setAuthToken(_ tokenString: String?) async throws {
         // TODO: - Implement Keychain
         //precondition(true, "preferKeychain option must be disabled. Keychain is managed internally."
-        try Auth._setAuthToken(tokenString)
+        do {
+            try await Auth._setAuthToken(tokenString)
+        } catch { throw error }
     }
     
     /// Removes locally stored user data and signs out the user
@@ -42,25 +41,23 @@ extension Auth {
 extension Auth {
     
     @discardableResult
-    public static func login(with credentials: Credential) -> AnyPublisher<User,Error> {
-        return Auth.authenticate(with: credentials as! PasswordLoginCredentials)
-            .tryMap {
-                try Auth.setAuthToken($0.authToken.token)
-                return try User($0.authToken.token)
-            }
-            .catch { (error: Error) -> AnyPublisher<User,Error> in
-                Auth.authToken = nil
-                return Fail(error: error).eraseToAnyPublisher()
-            }
-            .eraseToAnyPublisher()
+    public static func login(with credentials: Credential) async throws -> User {
+        do {
+            let authResponse = try await Auth.authenticate(with: credentials as! PasswordLoginCredentials)
+            try await Auth._setAuthToken(authResponse.authToken.token)
+            return try User(authResponse.authToken.token)
+        } catch {
+            try? await Auth._setAuthToken(nil)
+            throw AuthError.error(error)
+        }
     }
     
     @discardableResult
-    public static func register(with credentials: Credential) -> AnyPublisher<Bool,Error> {
-        return Auth.register(with: credentials as! PasswordLoginCredentials)
-            .map(\.success)
-            .eraseToAnyPublisher()
+    public static func register(with credentials: Credential) async throws -> RegisterResponse {
+        return try await Auth.register(with: credentials as! PasswordLoginCredentials)
     }
+    
+    public static func fetchSessionToken() async throws { }
 }
 
 // MARK: - Private Setters
@@ -69,18 +66,19 @@ extension Auth {
     
     /// Sets the ```authToken```
     ///
-    /// - Postcondition: If ```AuthConfiguration/preferKeychain``` is `true` then the given `AuthToken` object will also be saved in to the keychain.
-    private static func _setAuthToken(_ tokenString: String?) throws {
+    /// - Postcondition: If ```AuthConfiguration/preferKeychain``` is `true`,
+    /// then the given `AuthToken` object will also be saved in to the keychain.
+    private static func _setAuthToken(_ tokenString: String?) async throws {
+       
         // TODO: - Handle Keychain
-        if let tokenString {
-           let token = try AuthToken(tokenString)
-        }
-        Auth.authToken = tokenString
+        do {
+            if let tokenString {  let _ = try AuthToken(tokenString) }
+            await Session.shared.setAuthToken(tokenString)
+        } catch { throw AuthError.error(error) }
     }
     
     /// Clears all the tokens both in memory and in keychain
     private static func _signOut() {
-        // TODO: - Handle Keychain
-        Auth.authToken = nil
+        Task {  await Session.shared.setAuthToken(nil) }
     }
 }

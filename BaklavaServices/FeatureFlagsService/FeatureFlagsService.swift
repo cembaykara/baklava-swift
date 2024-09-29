@@ -14,74 +14,63 @@ import Combine
 
 public extension Service where Entity: FeatureFlag {
 	
-	func getFlags() -> AnyPublisher<[Entity], Error> {
-		guard let url = FeatureFlagEndpoint.baseURL() else {
-			return Fail(error: ServiceError.urlError())
-				.eraseToAnyPublisher()
+    /// 
+    func getFlags() async throws -> [Entity] {
+		
+        guard let url = FeatureFlagEndpoint.baseURL() else {
+			throw ServiceError.urlError()
 		}
 		
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .get)
 			
-			return RequestHandler.execute(request)
-                .map(\.data)
-				.decode(type: [Entity].self, decoder: JSONDecoder())
-				.eraseToAnyPublisher()
-		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }
+            return try await Session.performHttp(request).decode(as: [Entity].self)
+        } catch { throw ServiceError.error(error) }
 	}
 	
 	@discardableResult
-	func deleteBy(id: UUID) -> AnyPublisher<URLResponse, Error> {
+    func deleteBy(id: UUID) async throws -> Bool {
 		guard let url = FeatureFlagEndpoint.delete(id: id).url() else {
-			return Fail(error: ServiceError.urlError())
-				.eraseToAnyPublisher()
+			throw ServiceError.urlError()
 		}
 		
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .delete)
 			
-			return RequestHandler.execute(request)
-				.map(\.response)
-				.eraseToAnyPublisher()
-		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }
+            try await Session.performHttp(request)
+            return true
+		} catch { throw ServiceError.error(error) }
 	}
 	
 	@discardableResult
-	func createNew(object: Entity) -> AnyPublisher<Entity, Error> {
+    func createNew(object: Entity) async throws -> Entity {
 		guard let url = FeatureFlagEndpoint.baseURL() else {
-			return Fail(error: ServiceError.urlError())
-				.eraseToAnyPublisher()
+            throw ServiceError.urlError()
 		}
 		
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .post(object))
 			
-			return RequestHandler.execute(request)
-				.map(\.data)
-				.decode(type: Entity.self, decoder: JSONDecoder())
-				.eraseToAnyPublisher()
-		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }
+            return try await Session.performHttp(request).decode(as: Entity.self)
+		} catch { throw ServiceError.error(error) }
 	}
 	
 	@discardableResult
-	func update(_ object: Entity) -> AnyPublisher<URLResponse, Error> {
+	func update(_ object: Entity) async throws -> Bool {
 		guard let id = object.id else {
-			return Fail(error: ServiceError.urlError())
-				.eraseToAnyPublisher()
+			throw ServiceError.urlError()
 		}
 		
 		guard let url = FeatureFlagEndpoint.update(id: id).url() else {
-			return Fail(error: ServiceError.urlError())
-				.eraseToAnyPublisher()
+			throw ServiceError.urlError()
 		}
 		
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .put(object))
 			
-			return RequestHandler.execute(request)
-				.map(\.response)
-				.eraseToAnyPublisher()
-		} catch { return Fail(error: ServiceError.error(error)).eraseToAnyPublisher() }
+			try await Session.performHttp(request)
+            return true
+		} catch { throw ServiceError.error(error) }
 	}
 }
 

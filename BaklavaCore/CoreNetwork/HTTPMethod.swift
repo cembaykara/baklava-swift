@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum HTTPMethod {
+@_spi(BKLInternal) public enum HTTPMethod {
 	case get
 	case put((any Encodable)? = nil)
 	case post((any Encodable)? = nil)

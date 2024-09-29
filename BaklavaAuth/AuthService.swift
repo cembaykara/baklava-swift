@@ -12,31 +12,25 @@ import Combine
 extension Auth {
     
     /// Authenticate with `PasswordLoginCredentials`
-    internal static func authenticate(with credentials: PasswordLoginCredentials) -> AnyPublisher<AuthResponse,Error> {
+    internal static func authenticate(with credentials: PasswordLoginCredentials) async throws -> AuthResponse {
         guard let url = credentials.endpoint.url() else {
             preconditionFailure("Encountered unexpected nil while making URL for \(AuthEndpoint.basePath)\n Path: \(credentials.endpoint.path)")
         }
         
         do {
             let bklRequest = try URLRequest.baklavaRequest(url: url, httpMethod: .post(credentials))
-            return RequestHandler.execute(bklRequest)
-                .map(\.data)
-                .decode(type: AuthResponse.self, decoder: JSONDecoder())
-                .eraseToAnyPublisher()
-        } catch { return Fail(error: AuthServiceError.error(error)).eraseToAnyPublisher() }
+            return try await Session.performHttp(bklRequest).decode(as: AuthResponse.self)
+        } catch { throw AuthError.error(error) }
     }
     
-    internal static func register(with credentials: PasswordLoginCredentials) -> AnyPublisher<RegisterResponse,Error> {
+    internal static func register(with credentials: PasswordLoginCredentials) async throws -> RegisterResponse {
         guard let url = AuthEndpoint.register.url() else {
             preconditionFailure("Encountered unexpected nil while making URL for \(AuthEndpoint.basePath)\n Path: \(AuthEndpoint.register.path)")
         }
         
         do {
             let bklRequest = try URLRequest.baklavaRequest(url: url, httpMethod: .post(credentials))
-            return RequestHandler.execute(bklRequest)
-                .map(\.data)
-                .decode(type: RegisterResponse.self, decoder: JSONDecoder())
-                .eraseToAnyPublisher()
-        } catch { return Fail(error: AuthServiceError.error(error)).eraseToAnyPublisher() }
+            return try await Session.performHttp(bklRequest).decode(as: RegisterResponse.self)
+        } catch { throw AuthError.error(error) }
     }
 }
