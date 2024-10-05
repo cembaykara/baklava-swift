@@ -8,30 +8,10 @@
 import Foundation
 
 // MARK: - URLRequest
-
+@_spi(BKLInternal)
 public extension URLRequest {
 	
     /// Builds a `URLRequest`object for a `BaklavaService` request.
-    ///
-    /// - Warning: This will be internal. Call from `BaklavaService`.
-    ///
-    /// # Example:
-    ///
-    /// ```swift
-    /// ...
-    /// var flags: [Flag] = []
-    ///
-    ///private var cancellable = Set<AnyCancellable>()
-    ///private let service = Service(Flag.self)
-    ///
-    ///func fetchFlags() {
-    ///    service.getFlags()
-    ///        .sink { print($0) } receiveValue: { self.flags = $0 }
-    ///        .store(in: &cancellable)
-    ///}
-    ///...
-    /// ```
-    ///
 	static func baklavaRequest(url: URL, httpMethod: HTTPMethod) throws -> URLRequest {
 		var request = URLRequest(url: url)
 		
@@ -45,4 +25,42 @@ public extension URLRequest {
 		request.httpMethod = httpMethod.description
 		return request
 	}
+}
+
+// MARK: - Data
+
+@_spi(BKLInternal) public extension Data {
+    
+    /// A convenience method to decode data to a `Decodable` with a `JSONDecoder`.
+    func decode<T>(as object: T.Type, withDecoder decoder: JSONDecoder = .init()) async throws -> T where T: Decodable {
+        do {
+            let jsonObject = try decoder.decode(T.self, from: self)
+            return jsonObject
+        } catch { throw error }
+    }
+}
+
+// MARK: - Task
+
+@_spi(BKLInternal) public extension Task where Failure == Error {
+    @discardableResult
+    static func retryable(
+        maxRetryCount: Int = 0,
+        retryDelay: TimeInterval = 0,
+        operation: @Sendable @escaping () async throws -> Success) -> Task {
+            Task {
+                for _ in 0..<maxRetryCount {
+                    do { return try await operation() }
+                    catch {
+                        let delay = UInt64(1_000_000_000 * retryDelay)
+                        try await Task<Never, Never>.sleep(nanoseconds: delay)
+                        
+                        continue
+                    }
+                }
+                
+                try Task<Never, Never>.checkCancellation()
+                return try await operation()
+            }
+        }
 }
