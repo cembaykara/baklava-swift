@@ -24,6 +24,7 @@ internal struct AuthToken: JWTToken, Equatable {
 }
 
 extension AuthToken: Codable {
+	
     /// A convenience property to get a ```User``` object
     internal var user: User {
         get throws { return try User(token) }

@@ -9,7 +9,11 @@ import Foundation
 import Combine
 @_spi(BKLInternal) import BaklavaCore
 
+/// An object to handle Baklava Auth Services
 public struct Auth {
+	
+	/// Configuration for `Auth` behaviour.
+	private(set) static var configuration: AuthConfiguration = .init()
     
     private init() { }
 }
@@ -18,16 +22,22 @@ public struct Auth {
 
 extension Auth {
     
+	/// Sets auth configuration.
+	public static func setConfiguration(_ configuration: AuthConfiguration) {
+		Auth.configuration = configuration
+	}
+	
     /// Sets the auth token
     ///
     /// - Warning: Use this method **only** if you have set
     /// ```AuthConfiguration/preferKeychain``` configuration to `false` and token management is done manually.
     public static func setAuthToken(_ tokenString: String?) async throws {
-        // TODO: - Implement Keychain
-        //precondition(true, "preferKeychain option must be disabled. Keychain is managed internally."
-        do {
-            try await Auth._setAuthToken(tokenString)
-        } catch { throw error }
+		precondition(
+			Auth.configuration.preferKeychain,
+			"preferKeychain option must be disabled. Keychain is managed internally."
+		)
+        do { try await Auth._setAuthToken(tokenString) }
+		catch { throw error }
     }
     
     /// Gets the auth token
@@ -45,6 +55,7 @@ extension Auth {
 
 extension Auth {
     
+	/// Login to Baklava
     @discardableResult
     public static func login(with credentials: Credential) async throws -> User {
         do {
@@ -57,6 +68,7 @@ extension Auth {
         }
     }
     
+	/// Register with Baklava
     @discardableResult
     public static func register(with credentials: Credential) async throws -> RegisterResponse {
         return try await Auth.register(with: credentials as! PasswordLoginCredentials)
@@ -72,10 +84,14 @@ extension Auth {
     /// Sets the ```authToken```
     ///
     /// - Postcondition: If ```AuthConfiguration/preferKeychain``` is `true`,
-    /// then the given `AuthToken` object will also be saved in to the keychain.
+    /// then the given token will also be saved in to the keychain.
     private static func _setAuthToken(_ tokenString: String?) async throws {
-       
-        // TODO: - Handle Keychain
+		
+		if Auth.configuration.preferKeychain {
+			// TODO: - Handle Keychain
+		}
+		
+        
         do {
             if let tokenString {  let _ = try AuthToken(tokenString) }
             await Session.shared.setAuthToken(tokenString)

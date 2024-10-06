@@ -24,7 +24,10 @@ import Foundation
 @_spi(BKLInternal) public extension Endpoint {
 	
 	static private var host: String {
-		guard let hostUrl = Baklava.configuration.host else { fatalError("No host address was provided. Did you configure Baklava correctly?") }
+		guard let hostUrl = Baklava.configuration.host else {
+			fatalError("No host address was provided. Did you configure Baklava correctly?")
+		}
+		
 		return hostUrl
 	}
 	
@@ -43,6 +46,7 @@ import Foundation
 	func url(with parameters: [any EndpointParameter]? = nil) -> URL? {
 		var component = Self.newComponent(with: parameters)
 		component.path.append(path)
+		
 		return component.url
 	}
 	

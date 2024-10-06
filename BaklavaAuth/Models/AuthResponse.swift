@@ -6,8 +6,11 @@
 //
 import Foundation
 
-struct AuthResponse: Decodable {
-    let authToken: AuthToken
+/// Authentication Response Object
+internal struct AuthResponse: Decodable {
+    
+	/// The wrapped `AuthToken`
+	internal let authToken: AuthToken
     
     init (from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -17,7 +20,8 @@ struct AuthResponse: Decodable {
 }
 
 extension AuthResponse {
-    enum CodingKeys: String, CodingKey {
+    
+	enum CodingKeys: String, CodingKey {
         case authToken
     }
 }
