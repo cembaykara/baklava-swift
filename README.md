@@ -54,9 +54,28 @@
 	}
  }
  ```
- Core hosts common models, logger and some basic networking features. Everything except the models will probobly be set internal.
+ Core hosts common models, logger and some basic networking features. Everything except the public models will probobly be set to internal.
  
- For the networking logic you would need the **BaklavaServices** module.
+ #### Basic Authentication
+ You will need to authenticate with your Baklava credentials. 
+ The **BaklavaAuth** module has all the basic functianilit you would need to authenticate.
+
+  ```swift
+ import BaklavaAuth
+ ```
+
+ ```swift
+ var user: User
+
+ func login(username: String, password: String) async throws -> User {
+	let credentials = PasswordLoginCredentials(username: username, password: password)
+	user = try await Auth.login(with: credentials)
+ }
+ ``` 
+ **Note:** The authentication module does not yet support persistent sessions.
+
+ #### Services
+ For interfacing with the API there is the **BaklavaServices** module.
 
  ```swift
  import BaklavaServices
@@ -64,22 +83,18 @@
 
  ###### Example
   ```swift
- import Foundation
- import Combine
+ import SwiftUI
  import BaklavaServices
 
   @Observable class FeatureFlagsViewModel {
 	var flags: [Flag] = []
 
-    private var cancellable = Set<AnyCancellable>()
 	private let service = Service(Flag.self)
 	
 	init() { fetchFlags() }
 	
-	func fetchFlags() {
-		service.getFlags()
-			.sink { print($0) } receiveValue: { self.flags = $0 }
-			.store(in: &cancellable)
+	func fetchFlags() async throws {
+		flags = try await service.getFlags()
 	}
     ...
   }

@@ -25,6 +25,8 @@ internal struct FeatureFlagsInterceptor: Interceptor {
         var _request = request
         
         // If auth token doesn't exist, do not bother with the session token
+		// TODO: - Implement token refresh
+		
         if await Session.shared.authToken == nil {
             return .failure(ServiceError.invalidAuthToken("No auth token found"))
         }

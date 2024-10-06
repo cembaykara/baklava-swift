@@ -18,16 +18,17 @@ import BaklavaCore
 /// ...
 /// var flags: [Flag] = []
 ///
-///private var cancellable = Set<AnyCancellable>()
+///
 ///private let service = Service(Flag.self)
 ///
-///func fetchFlags() {
-///    service.getFlags()
-///        .sink { print($0) } receiveValue: { self.flags = $0 }
-///        .store(in: &cancellable)
+///func fetchFlags() async throws {
+///    flags = try await service.getFlags()
 ///}
 ///...
 /// ```
+///
+/// The Service object can only be initialized with an Entity type
+/// and will change it's behaviour based on the entity.
 public struct Service<Entity> where Entity: EntityProtocol & Codable {
 	
 	public init (_ type: Entity.Type) { }

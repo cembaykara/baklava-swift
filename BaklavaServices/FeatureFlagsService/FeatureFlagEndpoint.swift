@@ -20,5 +20,4 @@ internal enum FeatureFlagEndpoint: Endpoint {
 			case .delete(let id): "/\(id)"
 		}
 	}
-	
 }
