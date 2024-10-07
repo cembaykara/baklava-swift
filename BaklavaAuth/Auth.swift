@@ -14,10 +14,6 @@ public struct Auth {
 	
 	/// Configuration for `Auth` behaviour.
 	private(set) static var configuration: AuthConfiguration = .init()
-	
-	private init() {
-		try? Auth._initializeAuth()
-	}
 }
 
 // MARK: - Public Setters
@@ -36,7 +32,7 @@ extension Auth {
 	public static func setAuthToken(_ tokenString: String?) async throws {
 		precondition(
 			Auth.configuration.preferKeychain,
-			"preferKeychain option must be disabled. Keychain is managed internally."
+			"Keychain is managed internally. preferKeychain option must be disabled."
 		)
 		do { try await Auth._setAuthToken(tokenString) }
 		catch { throw error }
@@ -99,13 +95,19 @@ extension Auth {
 	}
 	
 	/// Gets the ```authToken```
+	///
+	/// This will attempt to get the auth token ephemerally from ```Session```.
+	/// If not, then it will look into the keychain then will attempt to
+	/// set the auth token in ```Session``` and return the token.
 	private static func _getAuthToken() async -> String? {
 		if let tokenString = await Session.shared.authToken {
 			return tokenString
 		}
 		
 		if Auth.configuration.preferKeychain {
-			return try? SecureStorage.get(forKey: AuthKeys.authToken, toObject: String.self)
+			let tokenString = try? SecureStorage.get(forKey: AuthKeys.authToken, toObject: String.self)
+			await Session.shared.setAuthToken(tokenString)
+			return tokenString
 		}
 		
 		return nil
@@ -114,14 +116,5 @@ extension Auth {
 	/// Clears all the tokens both in memory and in keychain
 	private static func _logout() {
 		Task {  await Session.shared.setAuthToken(nil) }
-	}
-	
-	private static func _initializeAuth() throws {
-		Task {
-			if Auth.configuration.preferKeychain {
-				let tokenString = try SecureStorage.get(forKey: AuthKeys.authToken, toObject: String.self)
-				try await Auth._setAuthToken(tokenString)
-			}
-		}
 	}
 }

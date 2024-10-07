@@ -27,7 +27,7 @@ public protocol Interceptor {
     public static var shared = Session()
     
     /// Auth token of the session
-    private(set) public var authToken: String? // TODO: - This should be in Keychain
+    private(set) public var authToken: String?
     
     /// Sets Auth Token
     public func setAuthToken(_ authToken: String?) {
@@ -52,7 +52,7 @@ public protocol Interceptor {
                 } catch {
                     requestLogger.log(
                         BKLLogEntry(
-                            verbosityLevel: .info,
+							verbosityLevel: .warning,
                             message: "Interceptor encountered a problem. Reason: " +  error.localizedDescription))
                 }
             }
