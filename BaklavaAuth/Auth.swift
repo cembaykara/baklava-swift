@@ -115,6 +115,9 @@ extension Auth {
 	
 	/// Clears all the tokens both in memory and in keychain
 	private static func _logout() {
-		Task {  await Session.shared.setAuthToken(nil) }
+		Task {
+			await Session.shared.setAuthToken(nil)
+			SecureStorage.remove(forKey: AuthKeys.authToken)
+		}
 	}
 }
