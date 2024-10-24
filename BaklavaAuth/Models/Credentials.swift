@@ -10,7 +10,7 @@ import Foundation
 public protocol Credential { }
 
 /// Password credentials
-public struct PasswordLoginCredentials: Encodable, Credential {
+public struct PasswordCredentails: Encodable, Credential {
     
     /// Username of the user
     public let username: String

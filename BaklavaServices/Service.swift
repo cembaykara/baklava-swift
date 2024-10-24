@@ -32,7 +32,6 @@ import BaklavaCore
 public struct Service<Entity> where Entity: EntityProtocol & Codable {
 	
 	public init (_ type: Entity.Type) { }
-	
 }
 
 public enum ServiceError: LocalizedError {

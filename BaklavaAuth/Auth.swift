@@ -29,13 +29,12 @@ extension Auth {
 	///
 	/// - Warning: Use this method **only** if you have set
 	/// ```AuthConfiguration/preferKeychain``` configuration to `false` and token management is done manually.
-	public static func setAuthToken(_ tokenString: String?) async throws {
+	public static func setAuthToken(_ tokenString: String?) async {
 		precondition(
 			Auth.configuration.preferKeychain,
 			"Keychain is managed internally. preferKeychain option must be disabled."
 		)
-		do { try await Auth._setAuthToken(tokenString) }
-		catch { throw error }
+		await Auth._setAuthToken(tokenString)
 	}
 	
 	/// Gets the auth token
@@ -57,11 +56,12 @@ extension Auth {
 	@discardableResult
 	public static func login(with credentials: Credential) async throws -> User {
 		do {
-			let authResponse = try await Auth.authenticate(with: credentials as! PasswordLoginCredentials)
-			try await Auth._setAuthToken(authResponse.authToken.token)
+			let authResponse = try await Auth.authenticate(with: credentials as! PasswordCredentails)
+			await Auth._setAuthToken(authResponse.authToken.token)
+			
 			return try User(authResponse.authToken.token)
 		} catch {
-			try? await Auth._setAuthToken(nil)
+			await Auth._setAuthToken(nil)
 			throw AuthError.error(error)
 		}
 	}
@@ -69,7 +69,7 @@ extension Auth {
 	/// Register with Baklava
 	@discardableResult
 	public static func register(with credentials: Credential) async throws -> RegisterResponse {
-		return try await Auth.register(with: credentials as! PasswordLoginCredentials)
+		return try await Auth.register(with: credentials as! PasswordCredentails)
 	}
 	
 	public static func fetchSessionToken() async throws { }
@@ -83,7 +83,8 @@ extension Auth {
 	///
 	/// - Postcondition: If ```AuthConfiguration/preferKeychain``` is `true`,
 	/// then the given token will also be saved in to the keychain.
-	private static func _setAuthToken(_ tokenString: String?) async throws {
+	private static func _setAuthToken(_ tokenString: String?) async {
+		let logger = BKLLogger(subsystem: "BKL", category: "Auth")
 		do {
 			if Auth.configuration.preferKeychain, let tokenString {
 				try SecureStorage.set(object: tokenString, forKey: AuthKeys.authToken)
@@ -91,7 +92,9 @@ extension Auth {
 			
 			if let tokenString {  let _ = try AuthToken(tokenString) }
 			await Session.shared.setAuthToken(tokenString)
-		} catch { throw AuthError.error(error) }
+		} catch {
+			logger.log(.init(verbosityLevel: .warning, message: error.localizedDescription))
+		}
 	}
 	
 	/// Gets the ```authToken```
