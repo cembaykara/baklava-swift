@@ -1,5 +1,5 @@
 {
-  "originHash" : "59c8329864a231748a6bbce823b9fbe4a818ddbcd37325194a9e29dc9907cf78",
+  "originHash" : "0055ff54b84b88612d2f1ea3ca73a09461db9c02dee9f046cdee5a076a9f184b",
   "pins" : [
     {
       "identity" : "jwtdecode.swift",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "1e153ef009969543191970c66b7c60163c0b4a65",
         "version" : "3.2.0"
+      }
+    },
+    {
+      "identity" : "swiftyendpoint",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cembaykara/SwiftyEndpoint.git",
+      "state" : {
+        "revision" : "4511f322511c3ac460e6216fa1dd942fa5a16c0f",
+        "version" : "1.0.0"
       }
     }
   ],

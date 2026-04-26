@@ -25,7 +25,7 @@ import OSLog
 				case .notice:
 					logger.notice("\(entry.message)")
 				case .info:
-					logger.info("\(entry.message, privacy: .private)")
+					logger.info("\(entry.message)")
 				case .debug:
 					logger.debug("\(entry.message)")
 				case .trace:

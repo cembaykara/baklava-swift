@@ -7,4 +7,8 @@
 
 import Foundation
 
-public protocol EntityProtocol { }
+public protocol ResourceRepresentable {
+    var id: UUID? { get set }
+    var createdAt: Date? { get set }
+    var updatedAt: Date? { get set }
+}

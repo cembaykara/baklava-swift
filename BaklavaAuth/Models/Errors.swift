@@ -11,12 +11,14 @@ public enum AuthError: LocalizedError {
     case error(Error)
     case expiredToken(String)
     case invalidToken(String)
+    case unsupportedCredentials
     
     public var errorDescription: String? {
         switch self {
             case .error(let error): error.localizedDescription
             case .expiredToken(let token): token
             case .invalidToken(let token): token
+            case .unsupportedCredentials: "Unsupported credentials type."
         }
     }
 }

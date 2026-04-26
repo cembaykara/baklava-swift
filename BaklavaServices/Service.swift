@@ -7,6 +7,7 @@
 
 import Foundation
 import BaklavaCore
+@_spi(BKLInternal) import BaklavaAuth
 
 /// A Service that interracts with the Baklava API.
 ///
@@ -29,9 +30,16 @@ import BaklavaCore
 ///
 /// The Service object can only be initialized with an Entity type
 /// and will change it's behaviour based on the entity.
-public struct Service<Entity> where Entity: EntityProtocol & Codable {
+public struct Service<Entity> where Entity: ResourceRepresentable & Codable {
+    internal let interceptor: any Interceptor
 	
-	public init (_ type: Entity.Type) { }
+	public init (_ type: Entity.Type, interceptor: some Interceptor) {
+        self.interceptor = interceptor
+    }
+    
+    public init (_ type: Entity.Type) {
+        self.interceptor = BKLInterceptor()
+    }
 }
 
 public enum ServiceError: LocalizedError {

@@ -4,7 +4,7 @@
 //
 //  Created by Baris Cem Baykara on 06.10.2024.
 //
-import SwiftUI
+import Foundation
 
 /// Storage error
 public enum StorageError: LocalizedError {

@@ -10,117 +10,89 @@ import Combine
 @_spi(BKLInternal) import BaklavaCore
 
 /// An object to handle Baklava Auth Services
-public struct Auth {
-	
-	/// Configuration for `Auth` behaviour.
-	private(set) static var configuration: AuthConfiguration = .init()
+public final actor Auth {
+    public static let shared = Auth()
+    
+    private let context = AuthContext()
+    private init() {}
+    
+    // MARK: - Compatibility static API
+    public static func setConfiguration(_ configuration: AuthConfiguration) {
+        Task { await Auth.shared.setConfiguration(configuration) }
+    }
+    
+    public static func setAuthToken(_ tokenString: String?) async {
+        let config = await Auth.shared.getConfiguration()
+        precondition(
+            !config.preferKeychain,
+            "Keychain is managed internally. preferKeychain option must be disabled."
+        )
+        await Auth.shared.setAccessToken(tokenString)
+    }
+    
+    public static func getAuthToken() async -> String? {
+        await Auth.shared.getAccessToken()
+    }
+    
+    public static func clearAuthState() {
+        Task { await Auth.shared.clearAuthState() }
+    }
+    
+    @discardableResult
+    public static func login(with credentials: Credential) async throws -> User {
+        try await Auth.shared.login(with: credentials)
+    }
+    
+    @discardableResult
+    public static func register(with credentials: Credential) async throws -> RegisterResponse {
+        try await Auth.shared.register(with: credentials)
+    }
 }
 
-// MARK: - Public Setters
-
-extension Auth {
-	
-	/// Sets auth configuration.
-	public static func setConfiguration(_ configuration: AuthConfiguration) {
-		Auth.configuration = configuration
-	}
-	
-	/// Sets the auth token
-	///
-	/// - Warning: Use this method **only** if you have set
-	/// ```AuthConfiguration/preferKeychain``` configuration to `false` and token management is done manually.
-	public static func setAuthToken(_ tokenString: String?) async {
-		precondition(
-			Auth.configuration.preferKeychain,
-			"Keychain is managed internally. preferKeychain option must be disabled."
-		)
-		await Auth._setAuthToken(tokenString)
-	}
-	
-	/// Gets the auth token
-	public static func getAuthToken() async -> String? {
-		return await Auth._getAuthToken()
-	}
-	
-	/// Removes locally stored user data and signs out the user
-	public static func logout() {
-		Auth._logout()
-	}
-}
-
-// MARK: - Public Interfaces
-
-extension Auth {
-	
-	/// Login to Baklava
-	@discardableResult
-	public static func login(with credentials: Credential) async throws -> User {
-		do {
-			let authResponse = try await Auth.authenticate(with: credentials as! PasswordCredentails)
-			await Auth._setAuthToken(authResponse.authToken.token)
-			
-			return try User(authResponse.authToken.token)
-		} catch {
-			await Auth._setAuthToken(nil)
-			throw AuthError.error(error)
-		}
-	}
-	
-	/// Register with Baklava
-	@discardableResult
-	public static func register(with credentials: Credential) async throws -> RegisterResponse {
-		return try await Auth.register(with: credentials as! PasswordCredentails)
-	}
-	
-	public static func fetchSessionToken() async throws { }
-}
-
-// MARK: - Private Setters
-
-extension Auth {
-	
-	/// Sets the ```authToken```
-	///
-	/// - Postcondition: If ```AuthConfiguration/preferKeychain``` is `true`,
-	/// then the given token will also be saved in to the keychain.
-	private static func _setAuthToken(_ tokenString: String?) async {
-		let logger = BKLLogger(subsystem: "BKL", category: "Auth")
-		do {
-			if Auth.configuration.preferKeychain, let tokenString {
-				try SecureStorage.set(object: tokenString, forKey: AuthKeys.authToken)
-			}
-			
-			if let tokenString {  let _ = try AuthToken(tokenString) }
-			await Session.shared.setAuthToken(tokenString)
-		} catch {
-			logger.log(.init(verbosityLevel: .warning, message: error.localizedDescription))
-		}
-	}
-	
-	/// Gets the ```authToken```
-	///
-	/// This will attempt to get the auth token ephemerally from ```Session```.
-	/// If not, then it will look into the keychain then will attempt to
-	/// set the auth token in ```Session``` and return the token.
-	private static func _getAuthToken() async -> String? {
-		if let tokenString = await Session.shared.authToken {
-			return tokenString
-		}
-		
-		if Auth.configuration.preferKeychain {
-			let tokenString = try? SecureStorage.get(forKey: AuthKeys.authToken, toObject: String.self)
-			await Session.shared.setAuthToken(tokenString)
-			return tokenString
-		}
-		
-		return nil
-	}
-	
-	/// Clears all the tokens both in memory and in keychain
-	private static func _logout() {
-		Task {
-			await Session.shared.setAuthToken(nil)
-			SecureStorage.remove(forKey: AuthKeys.authToken)
-		}
-	}
+// MARK: - Public API
+public extension Auth {
+    func setConfiguration(_ configuration: AuthConfiguration) async {
+        await context.setConfiguration(configuration)
+    }
+    
+    func getConfiguration() async -> AuthConfiguration {
+        await context.getConfiguration()
+    }
+    
+    func setAccessToken(_ accessToken: String?) async {
+        await context.setAccessToken(accessToken)
+    }
+    
+    func getAccessToken() async -> String? {
+        await context.getAccessToken()
+    }
+    
+    @discardableResult
+    func login(with credentials: Credential) async throws -> User {
+        guard let passwordCredentials = credentials as? PasswordCredentials else {
+            throw AuthError.unsupportedCredentials
+        }
+        
+        do {
+            let authResponse = try await authenticate(with: passwordCredentials)
+            await setAccessToken(authResponse.authToken.token)
+            return try User(authResponse.authToken.token)
+        } catch {
+            await setAccessToken(nil)
+            throw AuthError.error(error)
+        }
+    }
+    
+    @discardableResult
+    func register(with credentials: Credential) async throws -> RegisterResponse {
+        guard let passwordCredentials = credentials as? PasswordCredentials else {
+            throw AuthError.unsupportedCredentials
+        }
+        return try await register(with: passwordCredentials)
+    }
+    
+    func clearAuthState() async {
+        await setAccessToken(nil)
+        SecureStorage.remove(forKey: AuthKeys.authToken)
+    }
 }

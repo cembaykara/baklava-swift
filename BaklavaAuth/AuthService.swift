@@ -12,25 +12,25 @@ import Combine
 extension Auth {
     
     /// Authenticate with `PasswordLoginCredentials`
-    internal static func authenticate(with credentials: PasswordCredentails) async throws -> AuthResponse {
+    internal func authenticate(with credentials: PasswordCredentials) async throws -> AuthResponse {
         guard let url = credentials.endpoint.url() else {
             preconditionFailure("Encountered unexpected nil while making URL for \(AuthEndpoint.basePath)\n Path: \(credentials.endpoint.path)")
         }
         
         do {
-            let bklRequest = try URLRequest.baklavaRequest(url: url, httpMethod: .post(credentials))
-            return try await Session.performHttp(bklRequest).decode(as: AuthResponse.self)
+            let request = try URLRequest.baklavaRequest(url: url, httpMethod: .post(credentials))
+            return try await NetworkSession.performHttp(request).decode(as: AuthResponse.self)
         } catch { throw AuthError.error(error) }
     }
     
-    internal static func register(with credentials: PasswordCredentails) async throws -> RegisterResponse {
+    internal func register(with credentials: PasswordCredentials) async throws -> RegisterResponse {
         guard let url = AuthEndpoint.register.url() else {
             preconditionFailure("Encountered unexpected nil while making URL for \(AuthEndpoint.basePath)\n Path: \(AuthEndpoint.register.path)")
         }
         
         do {
-            let bklRequest = try URLRequest.baklavaRequest(url: url, httpMethod: .post(credentials))
-            return try await Session.performHttp(bklRequest).decode(as: RegisterResponse.self)
+            let request = try URLRequest.baklavaRequest(url: url, httpMethod: .post(credentials))
+            return try await NetworkSession.performHttp(request).decode(as: RegisterResponse.self)
         } catch { throw AuthError.error(error) }
     }
 }

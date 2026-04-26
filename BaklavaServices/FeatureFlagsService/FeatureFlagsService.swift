@@ -23,7 +23,8 @@ public extension Service where Entity: FeatureFlag {
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .get)
 			
-			return try await Session.performHttp(request, interceptor: FeatureFlagsInterceptor()).decode(as: [Entity].self)
+            let response = try await NetworkSession.performHttp(request, interceptor: interceptor).decode(as: PageResponse<Entity>.self)
+			return response.data
 		} catch { throw ServiceError.error(error) }
 	}
 	
@@ -36,7 +37,7 @@ public extension Service where Entity: FeatureFlag {
 		
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .delete)
-			try await Session.performHttp(request, interceptor: FeatureFlagsInterceptor())
+			try await NetworkSession.performHttp(request, interceptor: interceptor)
 			
 			return true
 		} catch { throw ServiceError.error(error) }
@@ -52,7 +53,8 @@ public extension Service where Entity: FeatureFlag {
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .post(object))
 			
-			return try await Session.performHttp(request, interceptor: FeatureFlagsInterceptor()).decode(as: Entity.self)
+            let response = try await NetworkSession.performHttp(request, interceptor: interceptor).decode(as: Response<Entity>.self)
+			return response.data
 		} catch { throw ServiceError.error(error) }
 	}
 	
@@ -69,7 +71,7 @@ public extension Service where Entity: FeatureFlag {
 		
 		do {
 			let request = try URLRequest.baklavaRequest(url: url, httpMethod: .put(object))
-			try await Session.performHttp(request, interceptor: FeatureFlagsInterceptor())
+			try await NetworkSession.performHttp(request, interceptor: interceptor)
 			
 			return true
 		} catch { throw ServiceError.error(error) }

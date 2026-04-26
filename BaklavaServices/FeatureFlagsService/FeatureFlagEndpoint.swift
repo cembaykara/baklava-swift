@@ -7,10 +7,13 @@
 
 import Foundation
 @_spi(BKLInternal) import BaklavaCore
+import SwiftyEndpoint
 
-internal enum FeatureFlagEndpoint: Endpoint {
+internal enum FeatureFlagEndpoint: SwiftyEndpoint {
 	case update(id: UUID)
 	case delete(id: UUID)
+    
+    static var configuration: Baklava.Configuration { Baklava.getConfiguration() }
 	
 	static var basePath: String { "/flags" }
 	

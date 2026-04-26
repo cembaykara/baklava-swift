@@ -6,10 +6,13 @@
 //
 
 @_spi(BKLInternal) import BaklavaCore
+import SwiftyEndpoint
 
-internal enum AuthEndpoint: Endpoint {
+internal enum AuthEndpoint: SwiftyEndpoint {
     case password
     case register
+    
+    static var configuration: Baklava.Configuration { Baklava.getConfiguration() }
     
     static var basePath: String { "/auth" }
     

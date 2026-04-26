@@ -63,6 +63,4 @@ import Security
 		
 		SecItemDelete(query as CFDictionary)
 	}
-	
-	
 }

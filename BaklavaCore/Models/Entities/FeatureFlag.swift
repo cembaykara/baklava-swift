@@ -7,10 +7,7 @@
 
 import Foundation
 
-public protocol FeatureFlag: EntityProtocol {
-	
-	var id: UUID? { get set }
-	
+public protocol FeatureFlag: ResourceRepresentable {
 	var name: String { get set }
 	
 	var enabled: Bool { get set }
